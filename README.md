@@ -12,6 +12,7 @@ This project was designed to estabilish communication between Java processes in 
 1. Low latency
 1. No logging or replay
 1. Multiple producers and multiple consumer
+1. Large messages (1MB or greater)
 
 ## Basic usage
 
@@ -44,4 +45,37 @@ smoqueconfig.setPath(Paths.get("my_shm_folder"))
 Smoque smoque=new Smoque(smoqueConfig);
 ```
 
-## 
+### Instantiating a Queue
+
+To instantiate a Queue, one should set a name and a maximum length (in bytes).
+
+```java
+//Creating a queue with name "myQueue" with 500MB length
+SmoqueQueue myQueue = smoque.getQueue("myQueue", 500*1024*1024);
+```
+
+Queues are memory mapped files composed by two parts: a header, where are some queue metadata, and a body, where the messages are placed.  
+
+These are the headers fields:
+
+**filesize:** Total file size, in bytes.  
+**lockOwner:** The process id locking this queue for writing, zero if there is no locks.  
+**lastMessageTimestamp:** The timestamp in millis when last message was written in this queue.  
+**lastMessagePosistion:** The offset where the last message written was placed.
+**nextMessagePosition:** The offset where the next message to be written should be placed.
+
+### Producing to a queue
+
+To produce to a queue, one should get a Appender for that queue. It can be acquired with the method `getAppender()` in the class `Queue`. 
+
+```java
+//Acquiring an appender for queue myQueue
+SmoqueAppender smoqueAppender = myQueue.getAppender();
+```
+To append a message, one should  use the method `append()` from class `SmoqueAppender`. It receives a `String` that represents an identification of the producer, and a byte array, which contains the message itself.
+
+```java
+smoqueAppender.append("me", "Hello, World!");
+```
+
+
