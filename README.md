@@ -90,7 +90,7 @@ Here is an example:
 ```java
 //Creating a consumer that just prints the message
 SmoqueConsumer smoqueConsumer = 
-(identificatiton, data) -> System.out.println("Message from: "+identification+": +new String(data);
+(identificatiton, data) -> System.out.println("Message from: "+identification+": " +new String(data);
 
 //Acquiring the tailer
 SmoqueTailer tailer=queue.getTailer();
