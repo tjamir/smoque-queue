@@ -61,7 +61,7 @@ These are the headers fields:
 **filesize:** Total file size, in bytes.  
 **lockOwner:** The process id locking this queue for writing, zero if there is no locks.  
 **lastMessageTimestamp:** The timestamp in millis when last message was written in this queue.  
-**lastMessagePosistion:** The offset where the last message written was placed.
+**lastMessagePosistion:** The offset where the last message written was placed.  
 **nextMessagePosition:** The offset where the next message to be written should be placed.
 
 ### Producing to a queue
@@ -75,7 +75,34 @@ SmoqueAppender smoqueAppender = myQueue.getAppender();
 To append a message, one should  use the method `append()` from class `SmoqueAppender`. It receives a `String` that represents an identification of the producer, and a byte array, which contains the message itself.
 
 ```java
-smoqueAppender.append("me", "Hello, World!");
+smoqueAppender.append("me", "Hello, World!".getBytes());
 ```
 
+A Smoque Appender writes in the queue memory mapped file body in a circular fashion. It starts from the end of the header until end of file, and then goes back to start. This way, messages can be overwritten if the sum of producers are faster than any consumer.
+
+### Consuming from a queue
+
+Queue consumption can be done throught the class `SmoqueTailer`, with the method addConsumer.  
+To add a consumer, one should implement the `SmoqueConsumer` interface, which have the single method `onMessage`, that receives the identification of the procuer and the byte array.
+
+Here is an example:
+
+```java
+//Creating a consumer that just prints the message
+SmoqueConsumer smoqueConsumer = 
+(identificatiton, data) -> System.out.println("Message from: "+identification+": +new String(data);
+
+//Acquiring the tailer
+SmoqueTailer tailer=queue.getTailer();
+
+//Adding the consumer to the tailers. From this point, it should print any new messages.
+tailer.addConsumer(smoqueConsumer);
+```
+## Future work
+
+There is a lot of space for improvements in Smoque-queue. These are some of them:
+
+1. Migrating for newer Java version. It was written in Java 8 and uses Unsafe class, wich is not supported for newer releases.
+1. Performance improvements
+1. Better appender-tailer control, preventing loss of messages.
 
