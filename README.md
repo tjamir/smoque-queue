@@ -19,13 +19,13 @@ This project was designed to estabilish communication between Java processes in 
 
 This is the most simple possible instantiation:
 
-```
+```java
 Smoque smoque=new Smoque(new SmoqueConfig());
 ```
 
 However, it is possible to make some small tweaks on Smoque:
 
-```
+```java
 SmoqueConfig smoqueConfig=new SmoqueConfig();
 //Sets the folder where are the memory mapped files
 //The default value is the current folder
